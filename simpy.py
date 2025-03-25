@@ -1,7 +1,7 @@
 """The official simpy interpreter"""
 import math
-
-from exceptions import NotASimpyFile
+import re
+import exceptions
 
 
 def simpy(file_path: str) -> None:
@@ -19,15 +19,23 @@ def simpy(file_path: str) -> None:
         statements.
     """
     variables = {}
+    condition_true = False
     if file_path.endswith(".sp") is False:
-        raise NotASimpyFile(f"{file_path} does not end with .sp")
+        raise exceptions.NotASimpyFile(f"{file_path} does not end with .sp")
     with open(file_path, "r", encoding="utf-8") as f:
         iterable_reading = f.read().split("\n")
-        for line_num, line in enumerate(iterable_reading):
-            if not line:
+        for line_num, line_ in enumerate(iterable_reading):
+            line = line_
+            if condition_true and line.startswith("\t"):
+                line = line.strip("\t")
+            elif not condition_true and line.startswith("\t"):
+                continue
+            elif condition_true and line.startswith("\t") is False:
+                condition_true = False
+            elif not line.lstrip(" ") == line:
                 continue
 
-            elif line.startswith("out "):
+            if line.startswith("out "):
                 print_msg = line[len("out "):]
                 print_parts = print_msg.split(" + ")
                 final_output = []
@@ -83,7 +91,6 @@ def simpy(file_path: str) -> None:
                     var_value = variables[var_value[1:]]
 
                 variables[var_name] = var_value
-                print(f"{var_name} + {in_var_value}")
                 continue
 
             elif line.startswith("eval("):
@@ -111,6 +118,37 @@ def simpy(file_path: str) -> None:
                 variables[var_name] = result
                 continue
 
+            elif line.startswith("if "):
+                operators = ["=", "<", ">", "<=", ">="]
+                for operator_index_, operator in enumerate(operators):
+                    if not operator in line:
+                        continue
+                    operator_index = operator_index_
+
+                operator = re.search(operators[operator_index], line)
+                start = operator.start()
+                end = operator.end()
+                operator = line[start:end]
+                if operator == "=":
+                    variables_for_condition_ = list(re.finditer(r'\$', line))
+                    variables_for_condition = [
+                        (match.start(), match.end()) for match in variables_for_condition_]
+                    variables_to_compare = [line[variables_for_condition[0][0]+1:start-1],
+                                            line[variables_for_condition[1][0]+1:-1]]
+                    if '' in variables_to_compare:
+                        raise SyntaxError(f"In line {line_num+1}: {line}\n"
+                                          f"Syntax error.")
+                    for variable in variables_for_condition:
+                        if line[variable[0]+1:variable[1]+1] not in variables:
+                            raise NameError(f"In line {line_num+1}: {line}\n"
+                                            f"No such variable: {variable}")
+                    if variables[variables_to_compare[0]] == variables[variables_to_compare[1]]:
+                        condition_true = True
+
+                continue
+
             raise NotImplementedError(
                 f"In line {line_num+1}: {line}\n"
                 f"Not implemented yet.")
+
+simpy('test.sp')
