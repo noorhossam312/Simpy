@@ -4,6 +4,24 @@ import re
 import exceptions
 
 
+def variables_to_data(line: str, variables: dict = None, end: str = " "):
+    variables_in_string = line.count("$")
+    dollar_positions = [[] * variables_in_string]
+    vars_found = 0
+    for char_index, char in enumerate(line):
+        if char != "$":
+            continue
+        dollar_positions[vars_found].append(char_index)
+        vars_found = + 1
+    vars_found = 0
+    var_names = [[] * variables_in_string]
+    starting_point = line[dollar_positions[0][0]:]
+    for char_index, char in enumerate(starting_point):
+        if char != end:
+            continue
+        continue  # Continue logic later
+
+
 def simpy(file_path: str) -> None:
     """
     This is where all the code of a (.sp) file gets parsed and ran.
@@ -121,7 +139,7 @@ def simpy(file_path: str) -> None:
             elif line.startswith("if "):
                 operators = ["=", "<", ">", "<=", ">="]
                 for operator_index_, operator in enumerate(operators):
-                    if not operator in line:
+                    if operator not in line:
                         continue
                     operator_index = operator_index_
 
