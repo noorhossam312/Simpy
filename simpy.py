@@ -4,22 +4,25 @@ import re
 import exceptions
 
 
-def variables_to_data(line: str, variables: dict = None, end: str = " "):
+def variables_to_data(line: str, variables: dict, end: str = " "):
     variables_in_string = line.count("$")
     dollar_positions = [[] * variables_in_string]
     vars_found = 0
     for char_index, char in enumerate(line):
         if char != "$":
             continue
-        dollar_positions[vars_found].append(char_index)
+        dollar_positions[vars_found].append(char_index+1)
         vars_found = + 1
     vars_found = 0
     var_names = [[] * variables_in_string]
     starting_point = line[dollar_positions[0][0]:]
     for char_index, char in enumerate(starting_point):
-        if char != end:
-            continue
-        continue  # Continue logic later
+        while not vars_found <= variables_in_string:
+            if char == end:
+                vars_found = + 1
+                continue
+            var_names[vars_found].append(char)
+    pass  # Continue logic later
 
 
 def simpy(file_path: str) -> None:
