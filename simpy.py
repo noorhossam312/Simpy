@@ -145,6 +145,69 @@ def simpy(file_path: str) -> None:
                     if variables[variables_to_compare[0]] == variables[variables_to_compare[1]]:
                         condition_true = True
 
+                if operator == "<":
+                    variables_for_condition_ = list(re.finditer(r'\$', line))
+                    variables_for_condition = [
+                        (match.start(), match.end()) for match in variables_for_condition_]
+                    variables_to_compare = [line[variables_for_condition[0][0]+1:start-1],
+                                            line[variables_for_condition[1][0]+1:-1]]
+                    if '' in variables_to_compare:
+                        raise SyntaxError(f"In line {line_num+1}: {line}\n"
+                                          f"Syntax error.")
+                    for variable in variables_for_condition:
+                        if line[variable[0]+1:variable[1]+1] not in variables:
+                            raise NameError(f"In line {line_num+1}: {line}\n"
+                                            f"No such variable: {variable}")
+                    if variables[variables_to_compare[0]] < variables[variables_to_compare[1]]:
+                        condition_true = True
+
+                if operator == ">":
+                    variables_for_condition_ = list(re.finditer(r'\$', line))
+                    variables_for_condition = [
+                        (match.start(), match.end()) for match in variables_for_condition_]
+                    variables_to_compare = [line[variables_for_condition[0][0] + 1:start - 1],
+                                            line[variables_for_condition[1][0] + 1:-1]]
+                    if '' in variables_to_compare:
+                        raise SyntaxError(f"In line {line_num + 1}: {line}\n"
+                                          f"Syntax error.")
+                    for variable in variables_for_condition:
+                        if line[variable[0] + 1:variable[1] + 1] not in variables:
+                            raise NameError(f"In line {line_num + 1}: {line}\n"
+                                            f"No such variable: {variable}")
+                    if variables[variables_to_compare[0]] > variables[variables_to_compare[1]]:
+                        condition_true = True
+
+                if operator == "<=":
+                    variables_for_condition_ = list(re.finditer(r'\$', line))
+                    variables_for_condition = [
+                        (match.start(), match.end()) for match in variables_for_condition_]
+                    variables_to_compare = [line[variables_for_condition[0][0] + 1:start - 1],
+                                            line[variables_for_condition[1][0] + 1:-1]]
+                    if '' in variables_to_compare:
+                        raise SyntaxError(f"In line {line_num + 1}: {line}\n"
+                                          f"Syntax error.")
+                    for variable in variables_for_condition:
+                        if line[variable[0] + 1:variable[1] + 1] not in variables:
+                            raise NameError(f"In line {line_num + 1}: {line}\n"
+                                            f"No such variable: {variable}")
+                    if variables[variables_to_compare[0]] <= variables[variables_to_compare[1]]:
+                        condition_true = True
+
+                if operator == ">=":
+                    variables_for_condition_ = list(re.finditer(r'\$', line))
+                    variables_for_condition = [
+                        (match.start(), match.end()) for match in variables_for_condition_]
+                    variables_to_compare = [line[variables_for_condition[0][0] + 1:start - 1],
+                                            line[variables_for_condition[1][0] + 1:-1]]
+                    if '' in variables_to_compare:
+                        raise SyntaxError(f"In line {line_num + 1}: {line}\n"
+                                          f"Syntax error.")
+                    for variable in variables_for_condition:
+                        if line[variable[0] + 1:variable[1] + 1] not in variables:
+                            raise NameError(f"In line {line_num + 1}: {line}\n"
+                                            f"No such variable: {variable}")
+                    if variables[variables_to_compare[0]] >= variables[variables_to_compare[1]]:
+                        condition_true = True
                 continue
 
             raise NotImplementedError(
